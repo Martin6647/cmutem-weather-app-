@@ -1,8 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:logger/logger.dart';
+import 'package:provider/provider.dart';
+import 'package:weather/controller/weather_screen_controller.dart';
 import 'package:weather/screen/error_screen.dart';
-import 'package:weather/screen/success_screen.dart';
-import 'package:weather/services/google_service.dart';
+import 'package:weather/screen/weather_screen.dart';
+import 'package:weather/services/servicio_google.dart';
+import 'package:weather/services/servicio_rest.dart';
+import 'package:weather/services/servicio_ubicacion.dart';
 import 'package:weather/consts/app_colors.dart';
 
 /// Pantalla de inicio de sesión con autenticación vía Google.
@@ -32,7 +36,7 @@ class _LoginScreenState extends State<LoginScreen>
   );
 
   static const String _nombreClase = 'PantallaLogin';
-  final GoogleService _servicioGoogle = GoogleService();
+  final ServicioGoogle _servicioGoogle = ServicioGoogle();
 
   late final AnimationController _controladorFlotacion;
   late final AnimationController _controladorDesvanecimiento;
@@ -110,8 +114,26 @@ class _LoginScreenState extends State<LoginScreen>
       if (ok) {
         _logger.i('[$_nombreClase] Autenticación exitosa');
         Navigator.of(context).pushReplacement(
-          MaterialPageRoute<SuccessScreen>(
-            builder: (BuildContext context) => SuccessScreen(),
+          MaterialPageRoute<WeatherScreen>(
+            builder: (BuildContext context) => Provider<ServicioRest>(
+              create: (_) => ServicioRest(),
+              child: Provider<ServicioUbicacion>(
+                create: (_) => ServicioUbicacion(),
+                child: Provider<ServicioGoogle>(
+                  create: (_) => _servicioGoogle,
+                  child: ChangeNotifierProvider<WeatherScreenController>(
+                    create: (BuildContext context) =>
+                        WeatherScreenController(
+                          servicioRest: context.read<ServicioRest>(),
+                          servicioUbicacion:
+                              context.read<ServicioUbicacion>(),
+                          servicioGoogle: _servicioGoogle,
+                        ),
+                    child: const WeatherScreen(),
+                  ),
+                ),
+              ),
+            ),
           ),
         );
       } else {

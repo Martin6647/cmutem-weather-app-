@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:weather/consts/app_colors.dart';
 import 'package:weather/screen/login_screen.dart';
-import 'package:weather/services/google_service.dart';
+import 'package:weather/services/servicio_google.dart';
 
 /// Pantalla que se muestra después de una autenticación exitosa con Google.
 ///
 /// Esta pantalla celebra el inicio de sesión correcto, mostrando un mensaje de
 /// bienvenida y un icono de verificación. Proporciona al usuario la opción de
-/// cerrar sesión, lo que ejecuta el método [GoogleService.cerrarSesion] y
+/// cerrar sesión, lo que ejecuta el método [ServicioGoogle.cerrarSesion] y
 /// redirige de vuelta a la [LoginScreen].
 ///
 /// ## Estructura visual
@@ -31,7 +31,7 @@ import 'package:weather/services/google_service.dart';
 ///
 /// ## Dependencias
 /// - [AppColors]: Paleta de colores centralizada.
-/// - [GoogleService]: Servicio que maneja la autenticación con Google.
+/// - [ServicioGoogle]: Servicio que maneja la autenticación con Google.
 /// - [LoginScreen]: Pantalla de inicio de sesión a la que se redirige.
 ///
 /// ## Ejemplo de uso
@@ -44,7 +44,7 @@ import 'package:weather/services/google_service.dart';
 /// ```
 ///
 /// ## Consideraciones
-/// - La clase crea una instancia de [GoogleService] directamente (`_servicioGoogle`).
+/// - La clase crea una instancia de [ServicioGoogle] directamente (`_servicioGoogle`).
 ///   En aplicaciones más grandes, se recomienda inyectar el servicio mediante
 ///   un patrón de inyección de dependencias para facilitar pruebas y
 ///   mantenibilidad.
@@ -66,7 +66,7 @@ class SuccessScreen extends StatelessWidget {
   ///
   /// Se crea directamente en la clase; en un entorno con inyección de
   /// dependencias, podría recibirse como parámetro.
-  final GoogleService _servicioGoogle = GoogleService();
+  final ServicioGoogle _servicioGoogle = ServicioGoogle();
 
   /// Constructor de la pantalla de éxito.
   ///

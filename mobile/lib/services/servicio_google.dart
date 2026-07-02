@@ -20,7 +20,7 @@ import 'package:weather/consts/app_const.dart';
 /// - `idToken`: JWT emitido por Google que identifica al usuario.
 /// - `scope`: Permiso OAuth2 solicitado al proveedor de identidad.
 /// - `Keychain/Keystore`: Almacén seguro a nivel sistema operativo.
-class GoogleService {
+class ServicioGoogle {
   final FlutterSecureStorage _almacenamiento;
   final Logger _logger;
   final GoogleSignIn _google;
@@ -32,7 +32,7 @@ class GoogleService {
   ///
   /// Los parámetros son opcionales para facilitar la inyección de
   /// dependencias en tests unitarios.
-  GoogleService({
+  ServicioGoogle({
     FlutterSecureStorage? almacenamiento,
     Logger? logger,
     GoogleSignIn? google,
