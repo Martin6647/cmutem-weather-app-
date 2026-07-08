@@ -92,6 +92,16 @@ class ServicioGoogle {
         key: AppConst.etiquetaEmail,
         value: cuenta.email,
       );
+      await _almacenamiento.write(
+        key: AppConst.etiquetaNombre,
+        value: cuenta.displayName,
+      );
+      await _almacenamiento.write(
+        key: AppConst.etiquetaUrlFoto,
+        value: cuenta.photoUrl,
+      );
+
+
 
       _logger.i('User authenticated: ${cuenta.email}');
       return true;
@@ -111,15 +121,6 @@ class ServicioGoogle {
     }
   }
 
-  /// Obtiene el email del usuario autenticado.
-  Future<String?> obtenerEmail() async {
-    try {
-      return await _almacenamiento.read(key: AppConst.etiquetaEmail);
-    } catch (error) {
-      _logger.e('Failed to retrieve email from secure storage', error: error);
-      return null;
-    }
-  }
 
   /// Verifica si el usuario tiene una sesión activa.
   ///

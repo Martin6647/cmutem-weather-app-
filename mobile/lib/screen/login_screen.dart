@@ -372,7 +372,7 @@ class _LoginScreenState extends State<LoginScreen>
               const SizedBox(width: 12),
               Text(
                 _estaCargando ? 'Iniciando sesión...' : 'Continuar con Google',
-                style: Theme.of(context).textTheme.labelLarge,
+                style: TextStyle(color: AppColors.naranjaPrimario)
               ),
             ],
           ),

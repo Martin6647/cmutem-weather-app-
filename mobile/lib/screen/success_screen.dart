@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:weather/consts/app_colors.dart';
 import 'package:weather/screen/login_screen.dart';
 import 'package:weather/services/servicio_google.dart';
+import 'package:weather/widgets/my_menu.dart';
 
 /// Pantalla que se muestra después de una autenticación exitosa con Google.
 ///
@@ -74,43 +75,15 @@ class SuccessScreen extends StatelessWidget {
   /// típicamente de otras fuentes (servicio, almacenamiento local).
   SuccessScreen({super.key});
 
-  /// Maneja el cierre de sesión del usuario.
-  ///
-  /// Este método asíncrono:
-  /// 1. Llama a `_servicioGoogle.cerrarSesion()` para finalizar la sesión.
-  /// 2. Comprueba que el contexto siga montado (evita navegación en widgets
-  ///    destruidos).
-  /// 3. Navega a la [LoginScreen] reemplazando la pila actual.
-  ///
-  /// [context]: El contexto de construcción del widget, necesario para
-  ///            la navegación y para verificar `mounted`.
-  Future<void> _manejarCierreSesion(BuildContext context) async {
-    await _servicioGoogle.cerrarSesion();
-    // Verificar que el widget aún esté en el árbol antes de navegar
-    if (context.mounted) {
-      Navigator.of(context).pushReplacement(
-        MaterialPageRoute(builder: (context) => const LoginScreen()),
-      );
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(
+        title: const Text('Autenticación Exitosa'),
+        centerTitle: true,
+      ),
+      drawer: MyMenu(),
       body: Container(
-        decoration: const BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment(0.42, -0.91),
-            end: Alignment(-0.42, 0.91),
-            colors: [
-              AppColors.naranjaPrimarioClaro,
-              AppColors.naranjaPrimario,
-              AppColors.naranjaPrimarioMedio,
-              AppColors.naranjaPrimarioOscuro,
-            ],
-            stops: [0.0, 0.25, 0.5, 1.0],
-          ),
-        ),
         child: Stack(
           children: [
             // Efecto de luz radial para dar profundidad
@@ -129,89 +102,48 @@ class SuccessScreen extends StatelessWidget {
                 children: [
                   Expanded(
                     child: SingleChildScrollView(
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          const SizedBox(height: 24),
-                          // Icono de éxito con sombra
-                          Icon(
-                            Icons.check_circle,
-                            size: 120,
-                            color: AppColors.blanco,
-                            shadows: [
-                              BoxShadow(
-                                color: AppColors.negroClaro,
-                                blurRadius: 16,
-                                offset: const Offset(0, 8),
-                              ),
-                            ],
-                          ),
-                          const SizedBox(height: 32),
-                          // Título principal
-                          Text(
-                            '¡Bienvenido!',
-                            style: Theme.of(context).textTheme.displayLarge,
-                          ),
-                          const SizedBox(height: 16),
-                          // Subtítulo descriptivo
-                          Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 24),
-                            child: Text(
-                              'Autenticación exitosa',
-                              textAlign: TextAlign.center,
-                              style: Theme.of(context).textTheme.bodyLarge
-                                  ?.copyWith(color: AppColors.blancoClarisimo),
-                            ),
-                          ),
-                          const SizedBox(height: 48),
-                          // Área de información y botón de cierre de sesión
-                          Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 24),
-                            child: Column(
-                              children: [
-                                // Contenedor placeholder para datos del usuario
-                                Container(
-                                  padding: const EdgeInsets.all(16),
-                                  decoration: BoxDecoration(
-                                    color: AppColors.blanco.withValues(
-                                      alpha: 0.1,
-                                    ),
-                                    borderRadius: BorderRadius.circular(12),
-                                  ),
-                                  child: Text('Exito'), // Placeholder
-                                ),
-                                const SizedBox(height: 32),
-                                // Botón de cierre de sesión
-                                SizedBox(
-                                  width: double.infinity,
-                                  child: ElevatedButton(
-                                    style: ElevatedButton.styleFrom(
-                                      backgroundColor: AppColors.blanco,
-                                      padding: const EdgeInsets.symmetric(
-                                        vertical: 16,
-                                      ),
-                                      shape: RoundedRectangleBorder(
-                                        borderRadius: BorderRadius.circular(12),
-                                      ),
-                                    ),
-                                    onPressed: () =>
-                                        _manejarCierreSesion(context),
-                                    child: Text(
-                                      'Cerrar sesión',
-                                      style: Theme.of(context)
-                                          .textTheme
-                                          .labelLarge
-                                          ?.copyWith(
-                                            color: AppColors.naranjaPrimario,
-                                          ),
-                                    ),
-                                  ),
+                      child: Center(
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            const SizedBox(height: 24),
+                            // Icono de éxito con sombra
+                            Icon(
+                              Icons.check_circle,
+                              size: 120,
+                              color: AppColors.blanco,
+                              shadows: [
+                                BoxShadow(
+                                  color: AppColors.negroClaro,
+                                  blurRadius: 16,
+                                  offset: const Offset(0, 8),
                                 ),
                               ],
                             ),
-                          ),
-                          const SizedBox(height: 24),
-                        ],
+                            const SizedBox(height: 32),
+                            // Título principal
+                            Text(
+                              '¡Bienvenido!',
+                              style: Theme.of(context).textTheme.displayLarge,
+                            ),
+                            const SizedBox(height: 16),
+                            // Subtítulo descriptivo
+                            Padding(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 24,
+                              ),
+                              child: Text(
+                                'Autenticación exitosa',
+                                textAlign: TextAlign.center,
+                                style: Theme.of(context).textTheme.bodyLarge
+                                    ?.copyWith(
+                                      color: AppColors.blancoClarisimo,
+                                    ),
+                              ),
+                            ),
+                            const SizedBox(height: 48),
+                          ],
+                        ),
                       ),
                     ),
                   ),

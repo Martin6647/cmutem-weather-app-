@@ -2,9 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:provider/provider.dart';
+import 'package:weather/consts/app_colors.dart';
 import 'package:weather/controller/weather_screen_controller.dart';
 import 'package:weather/model/coordenada.dart';
 import 'package:weather/model/observacion_meteo.dart';
+import 'package:weather/widgets/my_menu.dart';
 
 /// Pantalla principal de monitoreo meteorológico.
 ///
@@ -41,6 +43,7 @@ class _WeatherScreenState extends State<WeatherScreen> {
         title: const Text('Monitoreo Meteorológico'),
         centerTitle: true,
       ),
+      drawer: MyMenu(),
       body: Consumer<WeatherScreenController>(
         builder:
             (
@@ -70,7 +73,11 @@ class _WeatherScreenState extends State<WeatherScreen> {
               return Column(
                 children: <Widget>[
                   Expanded(flex: 1, child: _construirSeccionMapa(controlador)),
-                  const Divider(height: 1, thickness: 2.0, color: Colors.grey),
+                  const Divider(
+                    height: 1,
+                    thickness: 2.0,
+                    color: AppColors.naranjaPrimario,
+                  ),
                   Expanded(flex: 1, child: _construirSeccionClima(controlador)),
                 ],
               );
@@ -91,7 +98,7 @@ class _WeatherScreenState extends State<WeatherScreen> {
           SizedBox(height: 16.0),
           Text(
             'Cargando datos meteorológicos...',
-            style: TextStyle(fontSize: 16.0, color: Colors.grey),
+            style: TextStyle(fontSize: 16.0, color: AppColors.gris),
           ),
         ],
       ),
@@ -109,14 +116,14 @@ class _WeatherScreenState extends State<WeatherScreen> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
-            const Icon(Icons.error_outline, size: 64.0, color: Colors.red),
+            const Icon(Icons.error_outline, size: 64.0, color: AppColors.rojo),
             const SizedBox(height: 16.0),
             Text(
               mensaje,
               style: const TextStyle(
                 fontSize: 16.0,
                 fontWeight: FontWeight.w500,
-                color: Colors.red,
+                color: AppColors.rojo,
               ),
               textAlign: TextAlign.center,
             ),
@@ -146,11 +153,11 @@ class _WeatherScreenState extends State<WeatherScreen> {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: <Widget>[
-          Icon(Icons.cloud_off, size: 64.0, color: Colors.grey),
+          Icon(Icons.cloud_off, size: 64.0, color: AppColors.gris),
           SizedBox(height: 16.0),
           Text(
             'No hay datos meteorológicos disponibles',
-            style: TextStyle(fontSize: 16.0, color: Colors.grey),
+            style: TextStyle(fontSize: 16.0, color: AppColors.gris),
             textAlign: TextAlign.center,
           ),
         ],
@@ -181,7 +188,7 @@ class _WeatherScreenState extends State<WeatherScreen> {
               height: 40.0,
               child: const Icon(
                 Icons.location_pin,
-                color: Colors.red,
+                color: AppColors.rojo,
                 size: 40.0,
               ),
             ),
@@ -209,7 +216,7 @@ class _WeatherScreenState extends State<WeatherScreen> {
             valor,
             style: const TextStyle(
               fontSize: 16.0,
-              color: Colors.blueAccent,
+              color: AppColors.azulAcentuado,
               fontWeight: FontWeight.w600,
             ),
           ),

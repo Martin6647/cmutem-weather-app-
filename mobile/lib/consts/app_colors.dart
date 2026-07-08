@@ -69,6 +69,16 @@ class AppColors {
   /// Negro puro.
   static const Color negro = Colors.black;
 
+  /// Gris para textos secundarios y elementos deshabilitados.
+  static const Color gris = Colors.grey;
+
+  // ===== Colores Semánticos de Estado =====
+  /// Rojo para errores e iconos de error.
+  static const Color rojo = Colors.red;
+
+  /// Azul acentuado para datos destacados y valores principales.
+  static const Color azulAcentuado = Colors.blueAccent;
+
   // ===== Variantes de Opacidad =====
   /// Blanco con 10% de opacidad, ideal para superposiciones tenues.
   static final Color blancoClaro = Colors.white.withValues(alpha: 0.1);
