@@ -11,19 +11,26 @@ import 'package:weather/screen/login_screen.dart';
 /// efecto radial sutil, y un icono grande de "cancelar" para enfatizar el estado de error.
 ///
 /// ## Estructura visual
-/// - **Fondo**: Degradado lineal de naranja con un toque radial blanco para dar profundidad.
-/// - **Icono**: Icono `Icons.cancel` de gran tamaño (120 px) con sombra.
-/// - **Mensaje**: Título "¡Error!" y un texto descriptivo (personalizable).
-/// - **Botón**: Botón "Volver" que redirige a [LoginScreen].
+/// - **Fondo**: Degradado lineal de naranja (desde [AppColors.naranjaPrimarioClaro]
+///   hasta [AppColors.naranjaPrimarioOscuro]) con un toque radial blanco para dar
+///   profundidad y un efecto de luz.
+/// - **Icono**: Icono `Icons.cancel` de gran tamaño (120 px) con sombra,
+///   indicando claramente el estado de error.
+/// - **Mensaje**: Título "¡Error!" en un estilo de texto grande y un mensaje
+///   descriptivo (personalizable) con color blanco semi-transparente.
+/// - **Botón**: Botón "Volver" con estilo elevado (fondo blanco, texto naranja)
+///   que redirige a [LoginScreen].
 ///
 /// ## Parámetros
 /// - [mensajeError]: Texto opcional que describe el error. Si es `null`, se muestra
-///   un mensaje genérico: "Error al iniciar sesión con Google".
+///   un mensaje genérico: "Error al iniciar sesión con Google". Útil para
+///   personalizar el mensaje según el tipo de fallo.
 ///
 /// ## Comportamiento
 /// Al presionar el botón "Volver", la navegación reemplaza la pila actual con
-/// [LoginScreen], evitando que el usuario pueda regresar a esta pantalla de error
-/// con el botón "atrás" del sistema.
+/// [LoginScreen] usando [Navigator.pushReplacement]. Esto evita que el usuario
+/// pueda regresar a esta pantalla de error con el botón "atrás" del sistema,
+/// asegurando una experiencia de navegación limpia.
 ///
 /// ## Ejemplo de uso
 /// ```dart
@@ -44,29 +51,50 @@ import 'package:weather/screen/login_screen.dart';
 ///     builder: (context) => const ErrorScreen(),
 ///   ),
 /// );
+///
+/// // También se puede usar con pushReplacement si se quiere reemplazar
+/// // la pantalla actual por la de error
+/// Navigator.pushReplacement(
+///   context,
+///   MaterialPageRoute(
+///     builder: (context) => const ErrorScreen(),
+///   ),
+/// );
 /// ```
 ///
 /// ## Notas de diseño
-/// - Los colores utilizados provienen de [AppColors] (definido en `app_colors.dart`),
-///   que debe coincidir con la paleta de la aplicación.
-/// - El widget está envuelto en un [SingleChildScrollView] para soportar pantallas
-///   pequeñas, aunque el contenido es verticalmente centrado.
-/// - El botón "Volver" tiene un estilo elevado con fondo blanco y texto naranja,
-///   manteniendo coherencia con la marca.
+/// - Los colores utilizados provienen de [AppColors], lo que garantiza consistencia
+///   con la paleta de la aplicación y facilita futuros cambios.
+/// - El widget está envuelto en [SafeArea] para respetar las áreas seguras del
+///   dispositivo (como la muesca o la barra de estado).
+/// - El contenido está dentro de un [SingleChildScrollView] para soportar pantallas
+///   pequeñas y orientaciones verticales, aunque el contenido es centrado.
+/// - El botón "Volver" tiene un estilo elevado y redondeado (radio 12) que
+///   se mantiene coherente con la identidad visual de la app.
+/// - El icono grande de error incluye una sombra para darle profundidad y
+///   resaltar su importancia.
 ///
 /// ## Posibles mejoras
-/// - Agregar un [AppBar] opcional para integrarse con la navegación estándar.
-/// - Incluir un indicador de carga o reintento automático en futuras versiones.
-/// - Extraer el botón a un widget reutilizable para mantener el código limpio.
+/// - Agregar un [AppBar] opcional para integrarse con la navegación estándar
+///   y permitir un cierre manual en lugar de solo el botón.
+/// - Incluir un indicador de carga o reintento automático en futuras versiones,
+///   como un botón "Reintentar" que intente la operación nuevamente.
+/// - Extraer el botón a un widget reutilizable para mantener el código limpio
+///   y facilitar su uso en otras pantallas de error.
+/// - Considerar el soporte para temas oscuros/claros adaptando los colores
+///   según el tema del sistema, aunque actualmente usa colores fijos.
 class ErrorScreen extends StatelessWidget {
   /// Mensaje de error personalizado que se muestra al usuario.
   ///
   /// Si es `null`, se utiliza el mensaje por defecto: "Error al iniciar sesión con Google".
+  /// Este mensaje se muestra en un texto centrado con color blanco semi-transparente
+  /// ([AppColors.blancoClarisimo]).
   final String? mensajeError;
 
   /// Constructor de la pantalla de error.
   ///
   /// [mensajeError] es opcional y permite personalizar el texto mostrado.
+  /// La [key] se pasa al superconstructor para identificar el widget.
   const ErrorScreen({this.mensajeError, super.key});
 
   @override

@@ -11,8 +11,51 @@ import 'package:weather/consts/app_colors.dart';
 
 /// Pantalla de inicio de sesión con autenticación vía Google.
 ///
-/// Incluye animaciones de entrada (fade) y flotación continua del logo,
-/// manejo robusto de estados de carga y cancelación de autenticación.
+/// Esta pantalla es el punto de entrada de la aplicación. Presenta una interfaz
+/// atractiva con animaciones de entrada (desvanecimiento) y un logo con flotación
+/// continua, mientras el usuario inicia sesión con su cuenta de Google.
+///
+/// ## Flujo de autenticación
+/// 1. El usuario presiona el botón "Continuar con Google".
+/// 2. Se muestra un indicador de carga y se invoca [ServicioGoogle.iniciarSesion].
+/// 3. Según el resultado:
+///    - **Éxito**: Se navega a [WeatherScreen] con todos los servicios inyectados
+///      mediante [Provider] y [ChangeNotifierProvider].
+///    - **Cancelación**: El usuario cierra el diálogo de Google; se oculta la carga.
+///    - **Error**: Se captura la excepción y se navega a [ErrorScreen] con el mensaje.
+///
+/// ## Animaciones
+/// - **Flotación**: El logo (nube con sol) se mueve verticalmente de forma continua
+///   (sube y baja) en un ciclo de 3 segundos.
+/// - **Desvanecimiento**: Todos los elementos (logo, títulos, botón y pie) aparecen
+///   gradualmente durante 800 ms al cargar la pantalla.
+///
+/// ## Manejo de estado
+/// - `_estaCargando`: Controla la visibilidad del indicador de progreso en el botón
+///   y deshabilita el botón durante la autenticación.
+/// - El estado se actualiza de forma segura verificando `mounted` antes de `setState`.
+///
+/// ## Ejemplo de uso
+/// ```dart
+/// // Desde cualquier parte de la app (ej: splash screen)
+/// Navigator.pushReplacement(
+///   context,
+///   MaterialPageRoute(builder: (context) => const LoginScreen()),
+/// );
+/// ```
+///
+/// ## Notas de diseño
+/// - El fondo utiliza un degradado lineal naranja (identidad UTEM) con una
+///   superposición radial blanca para dar profundidad.
+/// - Los colores están centralizados en [AppColors].
+/// - Se usa [SingleChildScrollView] con `NeverScrollableScrollPhysics` para
+///   evitar desplazamiento innecesario.
+/// - El botón de Google tiene un diseño elevado con sombra y esquinas redondeadas.
+///
+/// ## Mejoras futuras
+/// - Implementar un mecanismo de reintento en caso de error de red.
+/// - Agregar un splash screen previo para precargar recursos.
+/// - Soportar otros métodos de autenticación (email/contraseña).
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
 
@@ -45,8 +88,6 @@ class _LoginScreenState extends State<LoginScreen>
 
   bool _estaCargando = false;
 
-
-
   @override
   void initState() {
     super.initState();
@@ -56,8 +97,13 @@ class _LoginScreenState extends State<LoginScreen>
 
   /// Configura las animaciones de flotación y desvanecimiento.
   ///
-  /// - Flotación: movimiento vertical continuo del logo (ida y vuelta).
-  /// - Desvanecimiento: entrada gradual de todos los elementos al cargar la pantalla.
+  /// - **Flotación**: Movimiento vertical continuo del logo (ida y vuelta)
+  ///   mediante un [AnimationController] que se repite infinitamente.
+  /// - **Desvanecimiento**: Entrada gradual de todos los elementos al cargar
+  ///   la pantalla mediante un [AnimationController] que se ejecuta una sola vez.
+  ///
+  /// Ambas animaciones usan curvas [Curves.easeInOut] y [Curves.easeOut] para
+  /// un movimiento suave y natural.
   void _inicializarAnimaciones() {
     // Controlador de flotación: 3 segundos por ciclo, se repite infinitamente.
     _controladorFlotacion = AnimationController(
@@ -65,12 +111,13 @@ class _LoginScreenState extends State<LoginScreen>
       vsync: this,
     )..repeat(reverse: true);
 
-    _animacionFlotacion = Tween<Offset>(
-      begin: Offset.zero,
-      end: const Offset(0, -0.015),
-    ).animate(
-      CurvedAnimation(parent: _controladorFlotacion, curve: Curves.easeInOut),
-    );
+    _animacionFlotacion =
+        Tween<Offset>(begin: Offset.zero, end: const Offset(0, -0.015)).animate(
+          CurvedAnimation(
+            parent: _controladorFlotacion,
+            curve: Curves.easeInOut,
+          ),
+        );
 
     // Controlador de desvanecimiento: 800ms, se ejecuta una sola vez al inicio.
     _controladorDesvanecimiento = AnimationController(
@@ -79,7 +126,10 @@ class _LoginScreenState extends State<LoginScreen>
     );
 
     _animacionDesvanecimiento = Tween<double>(begin: 0.0, end: 1.0).animate(
-      CurvedAnimation(parent: _controladorDesvanecimiento, curve: Curves.easeOut),
+      CurvedAnimation(
+        parent: _controladorDesvanecimiento,
+        curve: Curves.easeOut,
+      ),
     );
 
     _controladorDesvanecimiento.forward();
@@ -96,10 +146,20 @@ class _LoginScreenState extends State<LoginScreen>
 
   /// Maneja el flujo completo de autenticación con Google.
   ///
-  /// Diferencia tres escenarios:
-  /// 1. Éxito: navega a PantallaExito con la cuenta obtenida.
-  /// 2. Cancelación: el usuario cerró el diálogo de Google.
-  /// 3. Error: excepción durante el proceso, navega a PantallaError.
+  /// Este método es invocado al presionar el botón de login. Gestiona el estado
+  /// de carga y diferencia tres escenarios:
+  ///
+  /// 1. **Éxito (`ok == true`)**: Navega a [WeatherScreen] inyectando todos los
+  ///    servicios necesarios mediante [Provider] y [ChangeNotifierProvider].
+  ///    La navegación usa `pushReplacement` para eliminar la pantalla de login
+  ///    de la pila.
+  /// 2. **Cancelación (`ok == false`)**: El usuario cerró el diálogo de selección
+  ///    de cuenta de Google. Se oculta el indicador de carga sin navegar.
+  /// 3. **Error (excepción)**: Captura cualquier error, lo registra y navega a
+  ///    [ErrorScreen] mostrando el mensaje de la excepción.
+  ///
+  /// Se verifica `mounted` antes de cualquier operación de navegación o cambio
+  /// de estado para evitar errores en widgets desmontados.
   Future<void> _manejarLoginGoogle() async {
     _logger.i('[$_nombreClase] Iniciando proceso de autenticación con Google');
     _establecerEstadoCarga(true);
@@ -122,13 +182,11 @@ class _LoginScreenState extends State<LoginScreen>
                 child: Provider<ServicioGoogle>(
                   create: (_) => _servicioGoogle,
                   child: ChangeNotifierProvider<WeatherScreenController>(
-                    create: (BuildContext context) =>
-                        WeatherScreenController(
-                          servicioRest: context.read<ServicioRest>(),
-                          servicioUbicacion:
-                              context.read<ServicioUbicacion>(),
-                          servicioGoogle: _servicioGoogle,
-                        ),
+                    create: (BuildContext context) => WeatherScreenController(
+                      servicioRest: context.read<ServicioRest>(),
+                      servicioUbicacion: context.read<ServicioUbicacion>(),
+                      servicioGoogle: _servicioGoogle,
+                    ),
                     child: const WeatherScreen(),
                   ),
                 ),
@@ -150,9 +208,8 @@ class _LoginScreenState extends State<LoginScreen>
         _establecerEstadoCarga(false);
         Navigator.of(context).pushReplacement(
           MaterialPageRoute<ErrorScreen>(
-            builder: (BuildContext context) => ErrorScreen(
-              mensajeError: 'Error: ${error.toString()}',
-            ),
+            builder: (BuildContext context) =>
+                ErrorScreen(mensajeError: 'Error: ${error.toString()}'),
           ),
         );
       }
@@ -161,8 +218,12 @@ class _LoginScreenState extends State<LoginScreen>
 
   /// Actualiza el estado de carga de forma segura.
   ///
-  /// Verifica que el widget esté montado antes de llamar a setState,
-  /// evitando errores cuando la navegación ocurre durante una operación asíncrona.
+  /// Verifica que el widget esté montado antes de llamar a `setState`,
+  /// evitando errores cuando la navegación ocurre durante una operación
+  /// asíncrona y el widget ya se ha desmontado.
+  ///
+  /// Parámetro [cargando]: `true` para mostrar el indicador de carga y
+  /// deshabilitar el botón, `false` para volver al estado normal.
   void _establecerEstadoCarga(bool cargando) {
     if (!mounted) {
       return;
@@ -196,6 +257,9 @@ class _LoginScreenState extends State<LoginScreen>
   }
 
   /// Gradiente lineal de fondo con tonos naranjos (identidad visual UTEM).
+  ///
+  /// Utiliza los colores primarios definidos en [AppColors] y un degradado
+  /// que va desde claro a oscuro, dando sensación de profundidad.
   BoxDecoration _construirGradienteFondo() {
     return const BoxDecoration(
       gradient: LinearGradient(
@@ -213,22 +277,26 @@ class _LoginScreenState extends State<LoginScreen>
   }
 
   /// Capa decorativa con gradiente radial para dar profundidad visual.
+  ///
+  /// Añade un efecto de luz desde la parte superior izquierda, realzando
+  /// la sensación de relieve y atractivo visual.
   Widget _construirSobreposicionGradienteRadial() {
     return Container(
       decoration: BoxDecoration(
         gradient: RadialGradient(
           center: const Alignment(0.2, 0.5),
           radius: 0.8,
-          colors: <Color>[
-            AppColors.blancoClaro,
-            Colors.transparent,
-          ],
+          colors: <Color>[AppColors.blancoClaro, Colors.transparent],
         ),
       ),
     );
   }
 
   /// Contenido principal: logo, títulos y botón de login.
+  ///
+  /// Se usa [SingleChildScrollView] con `NeverScrollableScrollPhysics` para
+  /// evitar desplazamiento, ya que el contenido está centrado y cabe en
+  /// la mayoría de pantallas.
   Widget _construirContenidoPrincipal() {
     return SingleChildScrollView(
       physics: const NeverScrollableScrollPhysics(),
@@ -250,6 +318,10 @@ class _LoginScreenState extends State<LoginScreen>
   }
 
   /// Logo con animación combinada: flotación continua + desvanecimiento inicial.
+  ///
+  /// El logo es un [SlideTransition] que aplica la flotación vertical y un
+  /// [FadeTransition] para la entrada gradual. Además, incluye una etiqueta
+  /// semántica para accesibilidad.
   Widget _construirLogoAnimado() {
     return Semantics(
       label: 'Logo de Clima UTEM',
@@ -264,6 +336,10 @@ class _LoginScreenState extends State<LoginScreen>
   }
 
   /// Iconografía del logo: nube con sol superpuesto.
+  ///
+  /// Representa el concepto meteorológico de la aplicación, combinando
+  /// los iconos de `Icons.cloud` y `Icons.sunny` con colores blanco y
+  /// dorado [AppColors.oroSol].
   Widget _construirLogoClimatico() {
     return Container(
       width: 120,
@@ -280,25 +356,18 @@ class _LoginScreenState extends State<LoginScreen>
       child: Stack(
         alignment: Alignment.center,
         children: <Widget>[
-          const Icon(
-            Icons.cloud,
-            size: 100,
-            color: AppColors.blanco,
-          ),
+          const Icon(Icons.cloud, size: 100, color: AppColors.blanco),
           Positioned(
             top: 8,
             right: 8,
-            child: Icon(
-              Icons.sunny,
-              size: 48,
-              color: AppColors.oroSol,
-            ),
+            child: Icon(Icons.sunny, size: 48, color: AppColors.oroSol),
           ),
         ],
       ),
     );
   }
 
+  /// Título principal "Clima UTEM" con animación de desvanecimiento.
   Widget _construirTitulo() {
     return FadeTransition(
       opacity: _animacionDesvanecimiento,
@@ -313,6 +382,7 @@ class _LoginScreenState extends State<LoginScreen>
     );
   }
 
+  /// Subtítulo "Clima en tu ubicación" con animación de desvanecimiento.
   Widget _construirSubtitulo() {
     return FadeTransition(
       opacity: _animacionDesvanecimiento,
@@ -327,6 +397,7 @@ class _LoginScreenState extends State<LoginScreen>
     );
   }
 
+  /// Botón de login envuelto en un [FadeTransition] para la entrada gradual.
   Widget _construirBotonLogin() {
     return FadeTransition(
       opacity: _animacionDesvanecimiento,
@@ -337,7 +408,15 @@ class _LoginScreenState extends State<LoginScreen>
     );
   }
 
-  /// Botón de login con Google, muestra indicador de carga cuando corresponde.
+  /// Botón de inicio de sesión con Google.
+  ///
+  /// Muestra un indicador de carga ([CircularProgressIndicator]) cuando
+  /// `_estaCargando` es `true`, y deshabilita el `onTap` para evitar
+  /// múltiples pulsaciones. En estado normal, muestra el icono de Google
+  /// y el texto "Continuar con Google".
+  ///
+  /// El botón tiene un fondo blanco, esquinas redondeadas (12 px) y una
+  /// sombra sutil para dar elevación.
   Widget _construirBotonLoginGoogle() {
     return Material(
       color: Colors.transparent,
@@ -372,7 +451,7 @@ class _LoginScreenState extends State<LoginScreen>
               const SizedBox(width: 12),
               Text(
                 _estaCargando ? 'Iniciando sesión...' : 'Continuar con Google',
-                style: TextStyle(color: AppColors.naranjaPrimario)
+                style: TextStyle(color: AppColors.naranjaPrimario),
               ),
             ],
           ),
@@ -381,6 +460,10 @@ class _LoginScreenState extends State<LoginScreen>
     );
   }
 
+  /// Icono de Google utilizando el glifo `Icons.g_mobiledata`.
+  ///
+  /// Se colorea con [AppColors.azulGoogle] para mantener la identidad visual
+  /// del botón de Google.
   Widget _construirIconoGoogle() {
     return const Icon(
       Icons.g_mobiledata,
@@ -389,6 +472,10 @@ class _LoginScreenState extends State<LoginScreen>
     );
   }
 
+  /// Pie de página con texto de términos y condiciones.
+  ///
+  /// Aparece con la misma animación de desvanecimiento y utiliza un estilo
+  /// de texto pequeño y semi-transparente ([AppColors.blancoClarisimo]).
   Widget _construirPie() {
     return Padding(
       padding: const EdgeInsets.all(24.0),

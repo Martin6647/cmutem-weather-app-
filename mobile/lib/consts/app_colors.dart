@@ -12,23 +12,40 @@ import 'package:flutter/material.dart';
 /// - **Superficie y fondo**: Colores para fondos de pantalla y tarjetas.
 /// - **Semánticos**: Colores con significado específico (como oro para logros o azul para Google).
 /// - **Neutrales**: Blanco, negro y sus variantes con opacidad.
+/// - **Semánticos de estado**: Colores para errores, advertencias o datos destacados.
+/// - **Variantes de opacidad**: Versiones semitransparentes de blanco y negro.
 /// - **Tema claro**: Color base para el tema claro.
 ///
 /// ## Ejemplo de uso
 /// ```dart
 /// Container(
-///   color: ColoresApp.superficieOscura,
+///   color: AppColors.superficieOscura,
 ///   child: Text(
 ///     'Hola mundo',
-///     style: TextStyle(color: ColoresApp.blanco),
+///     style: TextStyle(color: AppColors.blanco),
 ///   ),
 /// )
 /// ```
 ///
-/// ## Nota sobre temas
-/// Para integrar estos colores con [ThemeData], se recomienda asignar
-/// [AppColors.naranjaPrimario] como `primaryColor` y usar el resto de colores
-/// manualmente en los widgets según sea necesario.
+/// ## Integración con [ThemeData]
+/// Para usar estos colores en un tema personalizado, puedes asignar
+/// [AppColors.naranjaPrimario] como `primaryColor` y utilizar el resto de colores
+/// manualmente en los widgets según sea necesario. Por ejemplo:
+/// ```dart
+/// MaterialApp(
+///   theme: ThemeData(
+///     primaryColor: AppColors.naranjaPrimario,
+///     brightness: Brightness.dark,
+///     scaffoldBackgroundColor: AppColors.superficieOscura,
+///     // ... resto del tema
+///   ),
+/// )
+/// ```
+///
+/// ## Nota sobre inmutabilidad
+/// Todos los colores son inmutables y seguros para usar en cualquier parte de la
+/// aplicación. Las variantes con opacidad se calculan en tiempo de compilación
+/// utilizando [Color.withValues], lo que garantiza un rendimiento óptimo.
 class AppColors {
   /// Constructor privado que impide la creación de instancias de esta clase.
   ///
@@ -49,7 +66,7 @@ class AppColors {
   static const Color naranjaPrimarioOscuro = Color(0xFFE8651E);
 
   // ===== Superficie y Fondo =====
-  /// Color de fondo para el modo oscuro.
+  /// Color de fondo para el modo oscuro (gris muy oscuro).
   static const Color superficieOscura = Color(0xFF1E1E1E);
 
   /// Color de fondo para el modo claro (blanco puro).
@@ -69,18 +86,18 @@ class AppColors {
   /// Negro puro.
   static const Color negro = Colors.black;
 
-  /// Gris para textos secundarios y elementos deshabilitados.
+  /// Gris estándar para textos secundarios y elementos deshabilitados.
   static const Color gris = Colors.grey;
 
   // ===== Colores Semánticos de Estado =====
-  /// Rojo para errores e iconos de error.
+  /// Rojo para errores, mensajes de peligro e iconos de error.
   static const Color rojo = Colors.red;
 
-  /// Azul acentuado para datos destacados y valores principales.
+  /// Azul acentuado para datos destacados, enlaces o valores principales.
   static const Color azulAcentuado = Colors.blueAccent;
 
   // ===== Variantes de Opacidad =====
-  /// Blanco con 10% de opacidad, ideal para superposiciones tenues.
+  /// Blanco con 10% de opacidad, ideal para superposiciones tenues sobre fondos oscuros.
   static final Color blancoClaro = Colors.white.withValues(alpha: 0.1);
 
   /// Blanco con 70% de opacidad, para textos secundarios sobre fondos oscuros.
@@ -94,5 +111,8 @@ class AppColors {
 
   // ===== Colores de Tema para Tema Claro =====
   /// Color semilla para el tema claro (basado en [Colors.deepOrange]).
+  ///
+  /// Este color se puede utilizar como base para generar un tema claro completo
+  /// con [ColorScheme.fromSeed].
   static const Color semillaTemaClaro = Colors.deepOrange;
 }

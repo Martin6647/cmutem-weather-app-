@@ -1,6 +1,6 @@
 /// Clase utilitaria que almacena las claves (etiquetas) utilizadas para
-/// almacenar y recuperar datos del usuario en el almacenamiento persistente
-/// (como SharedPreferences o similar).
+/// guardar y recuperar datos del usuario en el almacenamiento persistente
+/// (por ejemplo, [SharedPreferences]).
 ///
 /// Estas constantes definen los nombres de las claves para identificar de forma
 /// única cada dato relacionado con la sesión del usuario, evitando errores de
@@ -8,7 +8,7 @@
 ///
 /// ## Propósito
 /// Centralizar las claves de almacenamiento permite:
-/// - Evitar duplicación de cadenas literales en el código.
+/// - Evitar la duplicación de cadenas literales en el código.
 /// - Facilitar cambios en los nombres de las claves (solo se modifica aquí).
 /// - Mejorar la legibilidad y el autocompletado en el IDE.
 ///
@@ -20,42 +20,57 @@
 ///
 /// ## Ejemplo de uso
 /// ```dart
-/// // Guardar datos
-/// final prefs = await SharedPreferences.getInstance();
-/// await prefs.setString(ConstanteApp.etiquetaIdToken, 'abc123');
-/// await prefs.setString(ConstanteApp.etiquetaEmail, 'usuario@ejemplo.com');
+/// import 'package:shared_preferences/shared_preferences.dart';
 ///
-/// // Recuperar datos
-/// final token = prefs.getString(ConstanteApp.etiquetaIdToken);
-/// final email = prefs.getString(ConstanteApp.etiquetaEmail);
+/// // Guardar datos del usuario
+/// Future<void> guardarDatosUsuario(String token, String email) async {
+///   final prefs = await SharedPreferences.getInstance();
+///   await prefs.setString(AppConst.etiquetaIdToken, token);
+///   await prefs.setString(AppConst.etiquetaEmail, email);
+/// }
+///
+/// // Recuperar datos del usuario
+/// Future<Map<String, String?>> obtenerDatosUsuario() async {
+///   final prefs = await SharedPreferences.getInstance();
+///   return {
+///     'token': prefs.getString(AppConst.etiquetaIdToken),
+///     'email': prefs.getString(AppConst.etiquetaEmail),
+///     'nombre': prefs.getString(AppConst.etiquetaNombre),
+///     'foto': prefs.getString(AppConst.etiquetaUrlFoto),
+///   };
+/// }
 /// ```
 ///
 /// ## Notas
-/// - Todas las constantes son `static final String`, por lo que se acceden
-///   directamente desde la clase sin instanciar.
+/// - Todas las constantes son `static const String`, por lo que se acceden
+///   directamente desde la clase sin necesidad de instanciarla.
+/// - El uso de `const` garantiza que los valores sean inmutables y se
+///   optimicen en tiempo de compilación, mejorando el rendimiento.
 /// - Se recomienda usar estas constantes en lugar de cadenas literales para
-///   evitar errores tipográficos.
+///   evitar errores tipográficos y facilitar futuros cambios.
 class AppConst {
   /// Clave para almacenar el token de identificación (ID token) del usuario.
   ///
   /// Este token se utiliza para autenticar solicitudes al servidor y mantener
-  /// la sesión activa.
-  static final String etiquetaIdToken = "idToken";
+  /// la sesión activa. Ejemplo: `'idToken'`.
+  static const String etiquetaIdToken = "idToken";
 
   /// Clave para almacenar el correo electrónico del usuario autenticado.
   ///
   /// Se usa para mostrar el email en la interfaz o para recuperación de cuenta.
-  static final String etiquetaEmail = "email";
+  /// Ejemplo: `'email'`.
+  static const String etiquetaEmail = "email";
 
   /// Clave para almacenar el nombre del usuario (puede ser nombre completo
   /// o nombre de usuario).
   ///
   /// Se utiliza para personalizar saludos y mostrar información del perfil.
-  static final String etiquetaNombre = "name";
+  /// Ejemplo: `'name'`.
+  static const String etiquetaNombre = "name";
 
   /// Clave para almacenar la URL de la foto de perfil del usuario.
   ///
   /// Esta URL apunta a la imagen de avatar del usuario, que puede cargarse
-  /// con widgets como [Image.network].
-  static final String etiquetaUrlFoto = "photoUrl";
+  /// con widgets como [Image.network]. Ejemplo: `'photoUrl'`.
+  static const String etiquetaUrlFoto = "photoUrl";
 }
