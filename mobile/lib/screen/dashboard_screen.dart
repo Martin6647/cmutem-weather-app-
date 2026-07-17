@@ -15,16 +15,34 @@ class DashboardScreen extends StatefulWidget {
   State<DashboardScreen> createState() => _DashboardScreenState();
 }
 
-class _DashboardScreenState extends State<DashboardScreen> {
+class _DashboardScreenState extends State<DashboardScreen>
+    with WidgetsBindingObserver {
   @override
   void initState() {
     super.initState();
+
+    WidgetsBinding.instance.addObserver(this);
+
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      final controlador = context.read<WeatherScreenController>();
-      if (!controlador.tieneDatos) {
-        controlador.inicializarDatos();
+      if (mounted) {
+        context.read<WeatherScreenController>().inicializarDatos();
       }
     });
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) {
+      if (mounted) {
+        context.read<WeatherScreenController>().inicializarDatos();
+      }
+    }
   }
 
   @override
@@ -49,7 +67,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
     return Scaffold(
       backgroundColor: const Color(0xFFF5F7FA),
 
-      // 🔥 1. APPBAR LIMPIA: Solo el menú de hamburguesa, sin el ícono de usuario
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
@@ -92,6 +109,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
             final clima = controlador.observacionMeteo!;
             final farmacias = controlador.farmacias ?? [];
 
+            // Reviso si el sensor de la API mandó un error (-30000).
+            // Si es así, muestro "No disp." en lugar de un número incorrecto.
             String tempTexto = clima.temperatura <= -30000
                 ? 'N/A'
                 : '${clima.temperatura.toStringAsFixed(1)}º';
@@ -99,7 +118,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 ? 'Lluvia detectada'
                 : 'Cielo despejado';
 
-            // Preparar variables extra para el dashboard
             String humStr = clima.humedad <= -30000
                 ? 'N/A'
                 : '${clima.humedad.toInt()}%';
@@ -117,6 +135,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
               nombreFarmacia = farmacias.first.nombre ?? 'Farmacia de turno';
               String dirOriginal =
                   farmacias.first.direccion ?? 'Dirección no disponible';
+              // Limpio el texto de la dirección quitando la palabra "TURNOS" para mejorar el diseño visual.
               direccionFarmacia = dirOriginal
                   .replaceAll(
                     RegExp(r',?\s*TURNOS\s*', caseSensitive: false),
@@ -124,6 +143,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   )
                   .trim();
 
+              // Calculo la distancia en línea recta desde la ubicación actual hasta la farmacia.
               if (farmacias.first.latitud != null &&
                   farmacias.first.longitud != null) {
                 final distance = const Distance();
@@ -158,7 +178,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                     const SizedBox(height: 10),
 
                     const Text(
-                      'Bienvenido,',
+                      'Bienvenido',
                       style: TextStyle(
                         fontSize: 16,
                         color: AppColors.acentoVibrante,
@@ -187,7 +207,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
                     const SizedBox(height: 32),
 
-                    // TARJETA DE CLIMA PRINCIPAL
                     Container(
                       padding: const EdgeInsets.all(24),
                       decoration: BoxDecoration(
@@ -254,7 +273,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
                     const SizedBox(height: 16),
 
-                    // 🔥 2. FILA DE DETALLES RÁPIDOS: Humedad, UV, Viento
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
@@ -287,7 +305,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
                     ),
                     const SizedBox(height: 16),
 
-                    // TARJETA DE FARMACIA
                     Container(
                       decoration: BoxDecoration(
                         color: Colors.white,
@@ -367,7 +384,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
                     const SizedBox(height: 32),
 
-                    // 🔥 3. BOTÓN DE ACCIÓN PRINCIPAL PARA LLENAR EL ESPACIO
                     SizedBox(
                       width: double.infinity,
                       height: 60,
@@ -416,7 +432,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
     );
   }
 
-  // WIDGET AUXILIAR PARA LAS MINI TARJETAS
   Widget _construirMiniTarjeta(IconData icono, String valor, String titulo) {
     return Expanded(
       child: Container(

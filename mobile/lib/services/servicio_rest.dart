@@ -2,14 +2,8 @@ import 'package:dio/dio.dart';
 import 'package:logger/logger.dart';
 import 'package:pretty_dio_logger/pretty_dio_logger.dart';
 import 'package:weather/model/observacion_meteo.dart';
-import 'package:weather/model/farmacia.dart'; // Importación de nuestra nueva clase Farmacia
+import 'package:weather/model/farmacia.dart';
 
-/// Servicio REST para consumir la API de observaciones meteorológicas y farmacias.
-///
-/// Esta clase maneja todas las comunicaciones HTTP con el servidor backend,
-/// incluyendo la autenticación mediante token, configuración de timeouts,
-/// logging de peticiones/respuestas y mapeo de errores a mensajes amigables
-/// para el usuario.
 class ServicioRest {
   static final String _baseUrl = 'https://api.sebastian.cl/cmutem';
   static final Logger _logger = Logger();
@@ -129,14 +123,11 @@ class ServicioRest {
     }
   }
 
-  /// Obtiene la lista de farmacias de turno cercanas.
   Future<List<Farmacia>> obtenerFarmacias({
     required String idToken,
     required double latitud,
     required double longitud,
   }) async {
-    // ... (deja igual el inicio de validación de lat/long)
-
     final String latStr = latitud.toStringAsFixed(4);
     final String lonStr = longitud.toStringAsFixed(4);
     final String ruta = '/v1/farmacias/$latStr/$lonStr';

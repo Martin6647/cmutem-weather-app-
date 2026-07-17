@@ -9,25 +9,42 @@ import 'package:weather/model/observacion_meteo.dart';
 import 'package:weather/model/farmacia.dart';
 import 'package:weather/widgets/my_menu.dart';
 
-/// ## WeatherScreen
-/// Pantalla principal de la aplicación de monitoreo meteorológico.
-///
-/// **Patrón Arquitectónico**: Implementa el patrón MVA (Model-View-Architecture)
-/// mediante Provider, delegando toda la lógica de negocio al controlador centralizado.
-///
-/// **Gestión de Estado**: Utiliza [Consumer<WeatherScreenController>] para reactividad
-/// declarativa, garantizando que solo los widgets observadores se reconstruyan
-/// en respuesta a cambios de estado del modelo.
-///
-/// **Principios de Diseño**:
-/// - **Separación de Responsabilidades**: La vista solo renderiza; la lógica reside
-///   exclusivamente en [WeatherScreenController].
-/// - **Inmutabilidad**: Extiende [StatelessWidget] para asegurar comportamiento predecible
-///   y facilitar la depuración en ciclos de vida complejos.
-/// - **Manejo de Estados**: Implementa transiciones de estado explícitas:
-///   Cargando → Error → Vacío → Datos Válidos
-class WeatherScreen extends StatelessWidget {
+class WeatherScreen extends StatefulWidget {
   const WeatherScreen({super.key});
+
+  @override
+  State<WeatherScreen> createState() => _WeatherScreenState();
+}
+
+class _WeatherScreenState extends State<WeatherScreen>
+    with WidgetsBindingObserver {
+  @override
+  void initState() {
+    super.initState();
+
+    WidgetsBinding.instance.addObserver(this);
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) {
+        context.read<WeatherScreenController>().inicializarDatos();
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) {
+      if (mounted) {
+        context.read<WeatherScreenController>().inicializarDatos();
+      }
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -178,7 +195,6 @@ class WeatherScreen extends StatelessWidget {
                       ),
                     ),
                   ),
-
                   Padding(
                     padding: const EdgeInsets.only(
                       left: 20.0,
@@ -539,106 +555,111 @@ class WeatherScreen extends StatelessWidget {
             color: Colors.white,
             borderRadius: BorderRadius.vertical(top: Radius.circular(32)),
           ),
-          padding: const EdgeInsets.all(32.0),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Center(
-                child: Container(
-                  width: 50,
-                  height: 6,
-                  margin: const EdgeInsets.only(bottom: 32),
-                  decoration: BoxDecoration(
-                    color: AppColors.grisClaro,
-                    borderRadius: BorderRadius.circular(10),
+          child: SingleChildScrollView(
+            padding: EdgeInsets.only(
+              bottom: MediaQuery.of(context).viewInsets.bottom + 32.0,
+              top: 32.0,
+              left: 32.0,
+              right: 32.0,
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Center(
+                  child: Container(
+                    width: 50,
+                    height: 6,
+                    margin: const EdgeInsets.only(bottom: 32),
+                    decoration: BoxDecoration(
+                      color: AppColors.grisClaro,
+                      borderRadius: BorderRadius.circular(10),
+                    ),
                   ),
                 ),
-              ),
-              Row(
-                children: [
-                  Container(
-                    padding: const EdgeInsets.all(16),
-                    decoration: BoxDecoration(
-                      color: AppColors.rojo.withValues(alpha: 0.1),
-                      borderRadius: BorderRadius.circular(20),
-                    ),
-                    child: const Icon(
-                      Icons.local_pharmacy_rounded,
-                      color: AppColors.rojo,
-                      size: 36,
-                    ),
-                  ),
-                  const SizedBox(width: 20),
-                  Expanded(
-                    child: Text(
-                      farmacia.nombre ?? 'Farmacia',
-                      style: const TextStyle(
-                        fontSize: 24,
-                        fontWeight: FontWeight.w900,
-                        color: AppColors.principal,
+                Row(
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.all(16),
+                      decoration: BoxDecoration(
+                        color: AppColors.rojo.withValues(alpha: 0.1),
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                      child: const Icon(
+                        Icons.local_pharmacy_rounded,
+                        color: AppColors.rojo,
+                        size: 36,
                       ),
                     ),
+                    const SizedBox(width: 20),
+                    Expanded(
+                      child: Text(
+                        farmacia.nombre ?? 'Farmacia',
+                        style: const TextStyle(
+                          fontSize: 24,
+                          fontWeight: FontWeight.w900,
+                          color: AppColors.principal,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 32),
+                _construirFilaInfoExtra(
+                  Icons.location_on_rounded,
+                  'Dirección',
+                  dirLimpia,
+                ),
+                if (farmacia.telefono != null &&
+                    farmacia.telefono != '0' &&
+                    farmacia.telefono!.isNotEmpty) ...[
+                  const Divider(
+                    height: 40,
+                    color: AppColors.grisClaro,
+                    thickness: 2,
+                  ),
+                  _construirFilaInfoExtra(
+                    Icons.phone_rounded,
+                    'Teléfono',
+                    farmacia.telefono!,
                   ),
                 ],
-              ),
-              const SizedBox(height: 32),
-              _construirFilaInfoExtra(
-                Icons.location_on_rounded,
-                'Dirección',
-                dirLimpia,
-              ),
-
-              if (farmacia.telefono != null &&
-                  farmacia.telefono != '0' &&
-                  farmacia.telefono!.isNotEmpty) ...[
                 const Divider(
                   height: 40,
                   color: AppColors.grisClaro,
                   thickness: 2,
                 ),
                 _construirFilaInfoExtra(
-                  Icons.phone_rounded,
-                  'Teléfono',
-                  farmacia.telefono!,
+                  Icons.access_time_filled_rounded,
+                  'Horario',
+                  'Turno MINSAL vigente',
                 ),
+                const SizedBox(height: 40),
+                SizedBox(
+                  width: double.infinity,
+                  height: 56,
+                  child: ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: AppColors.acentoVibrante,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                      elevation: 0,
+                    ),
+                    onPressed: () => Navigator.pop(context),
+                    child: const Text(
+                      'Entendido',
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                      ),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 16),
               ],
-
-              const Divider(
-                height: 40,
-                color: AppColors.grisClaro,
-                thickness: 2,
-              ),
-              _construirFilaInfoExtra(
-                Icons.access_time_filled_rounded,
-                'Horario',
-                'Turno MINSAL vigente',
-              ),
-              const SizedBox(height: 40),
-              SizedBox(
-                width: double.infinity,
-                height: 56,
-                child: ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: AppColors.acentoVibrante,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(20),
-                    ),
-                    elevation: 0,
-                  ),
-                  onPressed: () => Navigator.pop(context),
-                  child: const Text(
-                    'Entendido',
-                    style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.white,
-                    ),
-                  ),
-                ),
-              ),
-              const SizedBox(height: 16),
-            ],
+            ),
           ),
         );
       },
@@ -703,10 +724,7 @@ class PantallaMapaCompleto extends StatelessWidget {
         elevation: 1,
       ),
       body: FlutterMap(
-        options: MapOptions(
-          initialCenter: puntoCentral,
-          initialZoom: 16.0,
-        ),
+        options: MapOptions(initialCenter: puntoCentral, initialZoom: 16.0),
         children: [
           TileLayer(
             urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',

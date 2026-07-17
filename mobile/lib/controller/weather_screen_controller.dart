@@ -6,6 +6,8 @@ import 'package:weather/services/servicio_google.dart';
 import 'package:weather/services/servicio_rest.dart';
 import 'package:weather/services/servicio_ubicacion.dart';
 
+/// Controlador principal de la app usando el patrón Provider.
+/// Maneja la comunicación entre la API, el GPS y lo que se muestra en pantalla.
 class WeatherScreenController extends ChangeNotifier {
   final ServicioRest servicioRest;
   final ServicioUbicacion servicioUbicacion;
@@ -30,6 +32,9 @@ class WeatherScreenController extends ChangeNotifier {
     required this.servicioGoogle,
   });
 
+  /// Método principal que carga toda la información necesaria.
+  /// Obtiene la ubicación actual y luego consulta el clima y las farmacias.
+  /// Utiliza bloques try-catch para manejar errores de conexión sin que la app colapse
   Future<void> inicializarDatos() async {
     _estaCargando = true;
     _mensajeError = null;
@@ -64,6 +69,7 @@ class WeatherScreenController extends ChangeNotifier {
     }
   }
 
+  /// Permite volver a intentar la conexión si el usuario presiona el botón de error.
   Future<void> reintentar() async {
     _estaCargando = true;
     _mensajeError = null;

@@ -58,7 +58,6 @@ class _LoginScreenState extends State<LoginScreen> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              // Icono principal
               Container(
                 padding: const EdgeInsets.all(24),
                 decoration: BoxDecoration(
@@ -73,7 +72,6 @@ class _LoginScreenState extends State<LoginScreen> {
               ),
               const SizedBox(height: 32),
 
-              // Textos
               const Text(
                 'UTEM Meteo',
                 style: TextStyle(

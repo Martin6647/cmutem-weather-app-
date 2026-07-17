@@ -1,5 +1,6 @@
+/// Clase para mapear los datos del clima que recibimos de la API.
 class ObservacionMeteo {
-  final String? idObservacion; // 🔥 Agregado para pasar el test del profesor
+  final String? idObservacion;
   final double temperatura;
   final double humedad;
   final double velocidadViento;
@@ -17,8 +18,10 @@ class ObservacionMeteo {
     required this.ultravioleta,
   });
 
+  /// Función para estructurar los datos del JSON.
+  /// Se encarga de arreglar problemas de la API (como recibir enteros en vez de decimales).
+  /// Si el dato es nulo, asigna un valor de control (-30000.0) para evitar que la aplicación se caiga.
   factory ObservacionMeteo.fromJson(Map<String, dynamic> json) {
-    // Función escudo con las llaves {} que exige el linter de tu proyecto
     double parseDato(dynamic valor) {
       if (valor == null) {
         return -30000.0;
@@ -33,8 +36,7 @@ class ObservacionMeteo {
     }
 
     return ObservacionMeteo(
-      idObservacion: json['id_observacion']
-          ?.toString(), // Rescatamos el ID de la API
+      idObservacion: json['id_observacion']?.toString(),
       temperatura: parseDato(json['temperatura']),
       humedad: parseDato(json['humedad']),
       velocidadViento: parseDato(json['velocidad_viento']),
