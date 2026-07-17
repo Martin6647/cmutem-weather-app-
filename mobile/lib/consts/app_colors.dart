@@ -1,118 +1,22 @@
 import 'package:flutter/material.dart';
 
-/// Clase utilitaria que centraliza todos los colores utilizados en la aplicación.
-///
-/// Esta clase define una paleta de colores consistente para temas oscuros y claros,
-/// facilitando el mantenimiento y la coherencia visual en toda la interfaz.
-/// Al ser una clase con constructor privado, no se puede instanciar; sus miembros
-/// se acceden de forma estática.
-///
-/// ## Organización de colores
-/// - **Primarios**: Gama de naranja para acentos y acciones principales.
-/// - **Superficie y fondo**: Colores para fondos de pantalla y tarjetas.
-/// - **Semánticos**: Colores con significado específico (como oro para logros o azul para Google).
-/// - **Neutrales**: Blanco, negro y sus variantes con opacidad.
-/// - **Semánticos de estado**: Colores para errores, advertencias o datos destacados.
-/// - **Variantes de opacidad**: Versiones semitransparentes de blanco y negro.
-/// - **Tema claro**: Color base para el tema claro.
-///
-/// ## Ejemplo de uso
-/// ```dart
-/// Container(
-///   color: AppColors.superficieOscura,
-///   child: Text(
-///     'Hola mundo',
-///     style: TextStyle(color: AppColors.blanco),
-///   ),
-/// )
-/// ```
-///
-/// ## Integración con [ThemeData]
-/// Para usar estos colores en un tema personalizado, puedes asignar
-/// [AppColors.naranjaPrimario] como `primaryColor` y utilizar el resto de colores
-/// manualmente en los widgets según sea necesario. Por ejemplo:
-/// ```dart
-/// MaterialApp(
-///   theme: ThemeData(
-///     primaryColor: AppColors.naranjaPrimario,
-///     brightness: Brightness.dark,
-///     scaffoldBackgroundColor: AppColors.superficieOscura,
-///     // ... resto del tema
-///   ),
-/// )
-/// ```
-///
-/// ## Nota sobre inmutabilidad
-/// Todos los colores son inmutables y seguros para usar en cualquier parte de la
-/// aplicación. Las variantes con opacidad se calculan en tiempo de compilación
-/// utilizando [Color.withValues], lo que garantiza un rendimiento óptimo.
 class AppColors {
-  /// Constructor privado que impide la creación de instancias de esta clase.
-  ///
-  /// Todos los colores se acceden mediante miembros estáticos.
-  AppColors._();
+  // Tonos Ultra-Modernos
+  static const Color principal = Color(0xFF4A4E69); // Un tono elegante y oscuro
+  static const Color fondo = Color(
+    0xFFF4F7FC,
+  ); // Un gris-azulado muy claro para fondos
+  static const Color acentoVibrante = Color(
+    0xFF6C63FF,
+  ); // Un morado vibrante moderno
 
-  // ===== Colores Primarios - Tema Oscuro =====
-  /// Naranja principal, utilizado para botones primarios, iconos destacados y encabezados.
-  static const Color naranjaPrimario = Color(0xFFFF7E36);
-
-  /// Variante más clara del naranja principal, útil para fondos de elementos interactivos.
-  static const Color naranjaPrimarioClaro = Color(0xFFFF9A56);
-
-  /// Variante media del naranja principal, para estados intermedios o degradados.
-  static const Color naranjaPrimarioMedio = Color(0xFFF67C3B);
-
-  /// Variante más oscura del naranja principal, para énfasis en textos o bordes.
-  static const Color naranjaPrimarioOscuro = Color(0xFFE8651E);
-
-  // ===== Superficie y Fondo =====
-  /// Color de fondo para el modo oscuro (gris muy oscuro).
-  static const Color superficieOscura = Color(0xFF1E1E1E);
-
-  /// Color de fondo para el modo claro (blanco puro).
-  static const Color fondoClaro = Colors.white;
-
-  // ===== Colores Semánticos =====
-  /// Color dorado (amarillo), usado para representar logros, premios o elementos premium.
-  static const Color oroSol = Color(0xFFFFD700);
-
-  /// Azul característico de Google, usado para integraciones o botones de inicio de sesión.
-  static const Color azulGoogle = Color(0xFF4285F4);
-
-  // ===== Colores Neutrales =====
-  /// Blanco puro.
-  static const Color blanco = Colors.white;
-
-  /// Negro puro.
-  static const Color negro = Colors.black;
-
-  /// Gris estándar para textos secundarios y elementos deshabilitados.
-  static const Color gris = Colors.grey;
-
-  // ===== Colores Semánticos de Estado =====
-  /// Rojo para errores, mensajes de peligro e iconos de error.
-  static const Color rojo = Colors.red;
-
-  /// Azul acentuado para datos destacados, enlaces o valores principales.
-  static const Color azulAcentuado = Colors.blueAccent;
-
-  // ===== Variantes de Opacidad =====
-  /// Blanco con 10% de opacidad, ideal para superposiciones tenues sobre fondos oscuros.
-  static final Color blancoClaro = Colors.white.withValues(alpha: 0.1);
-
-  /// Blanco con 70% de opacidad, para textos secundarios sobre fondos oscuros.
-  static final Color blancoClarisimo = Colors.white.withValues(alpha: 0.7);
-
-  /// Negro con 15% de opacidad, utilizado para sombras o separadores sutiles.
-  static final Color negroClaro = Colors.black.withValues(alpha: 0.15);
-
-  /// Negro con 20% de opacidad, para efectos de desenfoque o capas superpuestas.
-  static final Color negroMedio = Colors.black.withValues(alpha: 0.2);
-
-  // ===== Colores de Tema para Tema Claro =====
-  /// Color semilla para el tema claro (basado en [Colors.deepOrange]).
-  ///
-  /// Este color se puede utilizar como base para generar un tema claro completo
-  /// con [ColorScheme.fromSeed].
-  static const Color semillaTemaClaro = Colors.deepOrange;
+  // Reemplazando los colores antiguos por versiones más suaves y estéticas
+  static const Color naranjaPrimario = Color(
+    0xFFFF8C42,
+  ); // Un naranja más suave y moderno
+  static const Color azulAcentuado = Color(0xFF3A86FF); // Azul eléctrico limpio
+  static const Color rojo = Color(0xFFFF595E); // Rojo coral (menos agresivo)
+  static const Color verde = Color(0xFF8AC926); // Verde fresco
+  static const Color gris = Color(0xFF8D99AE); // Gris con un toque azulado
+  static const Color grisClaro = Color(0xFFEDF2F4);
 }
